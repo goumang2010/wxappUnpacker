@@ -65,7 +65,7 @@ function doWxss(dir,cb){
 	}
 	function runVM(name,code){
 		let wxAppCode={},handle={cssFile:name};
-		let vm=new VM({sandbox:Object.assign(new GwxCfg(),{__wxAppCode__:wxAppCode,setCssToHead:cssRebuild.bind(handle)})});
+		let vm=new VM({sandbox:Object.assign(new GwxCfg(),{$gwx(){},__wxAppCode__:wxAppCode,setCssToHead:cssRebuild.bind(handle)})});
 		vm.run(code);
 		for(let name in wxAppCode)if(name.endsWith(".wxss")){
 			handle.cssFile=path.resolve(frameName,"..",name);
@@ -74,6 +74,15 @@ function doWxss(dir,cb){
 	}
 	function preRun(dir,frameFile,mainCode,files,cb){
 		wu.addIO(cb);
+		// process main code
+		// const index = mainCode.indexOf('__wxAppCode__');
+		// const restCode  = mainCode.slice(index);
+		// const appFileList = restCode.split('__wxAppCode__').filter(x => x.includes('setCssToHead'));
+		// appFileList.forEach(str => {
+		// 	const [, wxssname, code] = str.match(/\['(.+)'\].+(setCssToHead.+)/);
+		// 	runList[path.resolve(dir, wxssname.replace('.wxss', '.html'))]=`__wxAppCode__${str}`;
+		// });
+		// runList[path.resolve(dir,"./app.wxss")]=mainCode.slice(0, index);
 		runList[path.resolve(dir,"./app.wxss")]=mainCode;
 		for(let name of files)if(name!=frameFile){
 			wu.get(name,code=>{
